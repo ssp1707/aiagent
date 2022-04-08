@@ -5,31 +5,33 @@
 To find the PEAS description for the given AI problem and develop an AI agent.
 
 ## THEORY
-A vacuum-cleaner world with just two locations.
-Each location can be clean or dirty.
-The agent can move left or right and can clean the square that it occupies.
+
+Considering Vacuum cleaner as agent and locations of 9 different rooms as environment we are going to develop an agent based on its cleanliness. If the room is clean it shifts to the next adjacent room, if it is dirty it clean the room and continue its activity.
 
 ## PEAS DESCRIPTION
+![EXPT 1 PEAS](https://user-images.githubusercontent.com/75234965/162352729-830b9534-9bb0-44eb-bde2-61c2924978e6.jpeg)
 
 
 ## DESIGN STEPS
 ### STEP 1:
-Identifying the input:
+Identifying the input: location of agent, status of location.
 
 ### STEP 2:
-Identifying the output:
+Identifying the output: Action(NE,West1,West2,South1,South2,East1,East2,North,Initial).
 
 ### STEP 3:
-Developing the PEAS description:
+Developing the PEAS description: Vacuum cleaner Performance Measure: Moving locations and cleanliness Environment: Locations T,A,B,C,D,P,Q,R,S Actuators: Brushes and Vacuum Extractor Sensors: Camera, Dirt detection sensor.
+
 ### STEP 4:
-Implementing the AI agent
+The agent should detect the dirt and clean-if the location it is dirty,else it should move to the adjacent location.
 
 ### STEP 5:
-Measure the performance parameters
+The performance is measured with the dirt detection and cleaning.
 
 ## PROGRAM
+```
 import random
-
+import time
 class Thing:
     """
         This represents any physical object that can appear in an Environment.
@@ -67,32 +69,39 @@ def TableDrivenAgentProgram(table):
     {percept_sequence:action} pairs.
     """
     percepts = []
-
+    
     def program(percept):
-        action =None
         percepts.append(percept)
-        action=table.get(tuple(percepts))
+        action=table.get(tuple(percept))
         return action
 
     return program
-
-loc_A, loc_B = (0, 0), (1, 0)  # The two locations for the Vacuum world
-
+    
+le_T, le_A, le_B, le_C, le_D, le_P, le_Q, le_R, le_S = (1,1), (2,2), (1,2), (0,2), (0,1), (0,0), (1,0), (2,0), (2,1) 
 
 def TableDrivenVacuumAgent():
     """
     Tabular approach towards vacuum world
     """
-    table = {((loc_A, 'Clean'),): 'Right',
-             ((loc_A, 'Dirty'),): 'Suck',
-             ((loc_B, 'Clean'),): 'Left',
-             ((loc_B, 'Dirty'),): 'Suck',
-             ((loc_A, 'Dirty'), (loc_A, 'Clean')): 'Right',
-             ((loc_A, 'Clean'), (loc_B, 'Dirty')): 'Suck',
-             ((loc_B, 'Clean'), (loc_A, 'Dirty')): 'Suck',
-             ((loc_B, 'Dirty'), (loc_B, 'Clean')): 'Left',
-             ((loc_A, 'Dirty'), (loc_A, 'Clean'), (loc_B, 'Dirty')): 'Suck',
-             ((loc_B, 'Dirty'), (loc_B, 'Clean'), (loc_A, 'Dirty')): 'Suck'}
+    table = {(le_T, 'Clean'): 'NE',
+             (le_T, 'Dirty'): 'Suck',
+             (le_A, 'Clean'): 'West1',
+             (le_A, 'Dirty'): 'Suck',
+             (le_B, 'Clean'): 'West2',
+             (le_B, 'Dirty'): 'Suck',
+             (le_C, 'Clean'): 'South1',
+             (le_C, 'Dirty'): 'Suck',
+             (le_D, 'Clean'): 'South2',
+             (le_D, 'Dirty'): 'Suck',
+             (le_P, 'Clean'): 'East1',
+             (le_P, 'Dirty'): 'Suck',
+             (le_Q, 'Clean'): 'East2',
+             (le_Q, 'Dirty'): 'Suck',
+             (le_R, 'Clean'): 'North',
+             (le_R, 'Dirty'): 'Suck',
+             (le_S, 'Clean'): 'Initial',
+             (le_S, 'Dirty'): 'Suck',
+    }
     return Agent(TableDrivenAgentProgram(table))
 
 
@@ -185,8 +194,15 @@ class TrivialVacuumEnvironment(Environment):
 
     def __init__(self):
         super().__init__()
-        self.status = {loc_A: random.choice(['Clean', 'Dirty']),
-                       loc_B: random.choice(['Clean', 'Dirty'])}
+        self.status = {le_T: random.choice(['Clean', 'Dirty']),
+                       le_A: random.choice(['Clean', 'Dirty']),
+                       le_B: random.choice(['Clean', 'Dirty']),
+                       le_C: random.choice(['Clean', 'Dirty']),
+                       le_D: random.choice(['Clean', 'Dirty']),
+                       le_P: random.choice(['Clean', 'Dirty']),
+                       le_Q: random.choice(['Clean', 'Dirty']),
+                       le_R: random.choice(['Clean', 'Dirty']),
+                       le_S: random.choice(['Clean', 'Dirty']),}
 
     def thing_classes(self):
         return [ TableDrivenVacuumAgent]
@@ -198,11 +214,32 @@ class TrivialVacuumEnvironment(Environment):
     def execute_action(self, agent, action):
         """Change agent's location and/or location's status; track performance.
         Score 10 for each dirt cleaned; -1 for each move."""
-        if action=='Right':
-            agent.location = loc_B
+        if action=='NE':
+            agent.location = le_A
             agent.performance -=1
-        elif action=='Left':
-            agent.location = loc_A
+        elif action=='West1':
+            agent.location = le_B
+            agent.performance -=1
+        elif action=='West2':
+            agent.location = le_C
+            agent.performance -=1
+        elif action=='South1':
+            agent.location = le_D
+            agent.performance -=1
+        elif action=='South2':
+            agent.location = le_P
+            agent.performance -=1
+        elif action=='East1':
+            agent.location = le_Q
+            agent.performance -=1
+        elif action=='East2':
+            agent.location = le_R
+            agent.performance -=1
+        elif action=='North':
+            agent.location = le_S
+            agent.performance -=1
+        elif action=='Initial':
+            agent.location = le_T
             agent.performance -=1
         elif action=='Suck':
             if self.status[agent.location]=='Dirty':
@@ -211,19 +248,32 @@ class TrivialVacuumEnvironment(Environment):
 
     def default_location(self, thing):
         """Agents start in either location at random."""
-        return random.choice([loc_A, loc_B])
+        return random.choice([le_T, le_A, le_B, le_C, le_D, le_P, le_Q, le_R, le_S])
 
 
 if __name__ == "__main__":
     agent = TableDrivenVacuumAgent()
     environment = TrivialVacuumEnvironment()
     environment.add_thing(agent)
-    print(environment.status)
-    environment.run()
-    print(agent.performance)
+    print('Starting Action\n',environment.status)
+    print('Agent Location\n',agent.location)
+    print('Agent Performance\n',agent.performance)
+    time.sleep(3)
+    for i in range(3):
+        print(environment.run(steps=1))
+        print('Ending Action\n',environment.status)
+        print('Agent Location\n',agent.location)
+        print('Agent Performance\n',agent.performance)
+        time.sleep(3)
+
+```
 
 ## OUTPUT
 
+![EXPT 1 1](https://user-images.githubusercontent.com/75234965/162352710-60bbf147-544b-49c1-ad17-5d2b350b9bbd.jpeg)
+
 
 ## RESULT
+
+Thus, a vacuum cleaner is developed as an agent and PEAS description is mentioned.
 
